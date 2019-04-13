@@ -4,6 +4,12 @@ import sys
 
 from datetime import datetime
 
+def findStat(stat, secondaries):
+    for secondary in secondaries:
+        if secondary['name'] == stat:
+            return secondary['display_value']
+    return 0
+
 allyCode = 455127936
 modTypes = {
     1: "Transmitter", 
@@ -23,7 +29,7 @@ setTypes = {
     6: "Potency",
     7: "Offense",
     8: "Speed"
-    }
+}
 
 client = coreapi.Client()
 schema = client.get("http://swgoh.gg/api/")
@@ -42,12 +48,8 @@ wb = xlwt.Workbook()
 ws = wb.add_sheet('mod list')
 ws.write(0, 0, 'slot')
 ws.write(0, 1, 'set')
-ws.write(0, 2, 'level')
-ws.write(0, 3, 'tier')
-ws.write(0, 4, 'primary_stat_type')
-ws.write(0, 5, 'primary_stat_value')
-ws.write(0, 6, 'character')
-ws.write(0, 7, 'secondary_stats')
+ws.write(0, 2, 'character')
+ws.write(0, 3, 'speed')
 
 row = 1
 col = 0
@@ -58,20 +60,15 @@ for item in result["mods"]:
         col += 1
         ws.write(row, col, setTypes[item['set']])
         col += 1
-        ws.write(row, col, item['level'])
-        col += 1
-        ws.write(row, col, item['tier'])
-        col += 1
-        ws.write(row, col, item['primary_stat']['name'])
-        col += 1
-        ws.write(row, col, item['primary_stat']['display_value'])
-        col += 1
         ws.write(row, col, item['character'])
         col += 1
+        secondary = findStat('Speed', item['secondary_stats'])
+        if secondary > 0:
+            ws.write(row, col, secondary)
 
         row +=1
         col = 0
     except Exception:
         col = 0
         
-wb.save('mods.xls')
+wb.save('mods2.xls')
